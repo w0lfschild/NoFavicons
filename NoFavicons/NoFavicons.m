@@ -36,6 +36,7 @@ NoFavicons *plugin;
 
 @implementation wb_BookmarkButtonCell
 
+static NSString *minWidth = @"wb_NF_minWidth";
 static NSArray *Folderhashes = nil;
 
 - (struct CGRect)imageRectForBounds:(struct CGRect)arg1
@@ -44,8 +45,6 @@ static NSArray *Folderhashes = nil;
     if ([[self title] isEqualToString:@""])
         return ZKOrig(struct CGRect, arg1);
     
-    [self setTitle:[self title]];
-    
     return CGRectZero;
 }
 
@@ -53,6 +52,23 @@ static NSArray *Folderhashes = nil;
 {
     // Proper text placement
     return 5.0;
+}
+
+- (struct CGSize)cellSize
+{
+    // Prevent this from resizing larger once the initial size is set above 0
+    // Buttons will still resize when edited but this prevents a resize when the favicon is first loaded
+    CGSize result = ZKOrig(struct CGSize);
+    int oldsize = [objc_getAssociatedObject(self, minWidth) intValue];
+    int newsize = result.width;
+    if (oldsize == 0)
+        objc_setAssociatedObject(self, minWidth, [NSNumber numberWithInt:newsize], OBJC_ASSOCIATION_RETAIN);
+    if (newsize <= oldsize)
+        objc_setAssociatedObject(self, minWidth, [NSNumber numberWithInt:newsize], OBJC_ASSOCIATION_RETAIN);
+    if (oldsize != 0)
+        result.width = oldsize;
+    
+    return result;
 }
 
 - (void)setBookmarkCellText:(id)arg1 image:(id)arg2
