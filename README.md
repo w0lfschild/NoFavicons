@@ -16,7 +16,7 @@
 # Installation:
 
 1. Download [mySIMBL](https://github.com/w0lfschild/app_updates/raw/master/mySIMBL/mySIMBL_master.zip)
-2. Download [NoFavicons](https://github.com/w0lfschild/NoFavicons/raw/master/build/NoFavicons.zip)
+2. Download [NoFavicons](https://github.com/w0lfschild/NoFavicons/raw/master/build/NoFavicons.bundle.zip)
 3. Unzip downloads
 4. Open `NoFavicons.bundle` with `mySIMBL.app`
 5. Restart Chrome
