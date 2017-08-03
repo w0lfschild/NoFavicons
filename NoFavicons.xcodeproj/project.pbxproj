@@ -16,9 +16,10 @@
 		2E2623A814F5914700EF319B /* NoFavicons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NoFavicons.m; path = NoFavicons/NoFavicons.m; sourceTree = "<group>"; };
 		FB20D3591D03C280008CF4BA /* ZKSwizzle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZKSwizzle.h; path = NoFavicons/ZKSwizzle.h; sourceTree = "<group>"; };
 		FB20D35A1D03C280008CF4BA /* ZKSwizzle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZKSwizzle.m; path = NoFavicons/ZKSwizzle.m; sourceTree = "<group>"; };
-		FB2D89B91F2AEAD40004310F /* BookmarkButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BookmarkButtonCell.h; path = "../../Desktop/z/chrome 60/BookmarkButtonCell.h"; sourceTree = "<group>"; };
+		FB3A115A1F33BD09000BF531 /* BookmarkButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BookmarkButton.h; path = NoFavicons/BookmarkButton.h; sourceTree = SOURCE_ROOT; };
+		FB3A115B1F33BD09000BF531 /* BookmarkButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BookmarkButtonCell.h; path = NoFavicons/BookmarkButtonCell.h; sourceTree = SOURCE_ROOT; };
 		FBC5C3DA1F33026300B16823 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = NoFavicons/Info.plist; sourceTree = "<group>"; };
-		FBC77E641F2955BE0045D548 /* BookmarkButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BookmarkButton.h; path = "../../Desktop/z/chrome 60/BookmarkButton.h"; sourceTree = "<group>"; };
+		FBC5C3DB1F33B0DB00B16823 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +40,7 @@
 				FBD4F7B01D049DF6001C318A /* Headers */,
 				2E2623A814F5914700EF319B /* NoFavicons.m */,
 				FBC5C3DA1F33026300B16823 /* Info.plist */,
+				FBC5C3DB1F33B0DB00B16823 /* README.md */,
 				2E26239314F590D000EF319B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -63,8 +65,8 @@
 		FBD4F7B01D049DF6001C318A /* Headers */ = {
 			isa = PBXGroup;
 			children = (
-				FBC77E641F2955BE0045D548 /* BookmarkButton.h */,
-				FB2D89B91F2AEAD40004310F /* BookmarkButtonCell.h */,
+				FB3A115A1F33BD09000BF531 /* BookmarkButton.h */,
+				FB3A115B1F33BD09000BF531 /* BookmarkButtonCell.h */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
