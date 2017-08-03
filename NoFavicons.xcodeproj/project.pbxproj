@@ -16,8 +16,9 @@
 		2E2623A814F5914700EF319B /* NoFavicons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NoFavicons.m; path = NoFavicons/NoFavicons.m; sourceTree = "<group>"; };
 		FB20D3591D03C280008CF4BA /* ZKSwizzle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZKSwizzle.h; path = NoFavicons/ZKSwizzle.h; sourceTree = "<group>"; };
 		FB20D35A1D03C280008CF4BA /* ZKSwizzle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZKSwizzle.m; path = NoFavicons/ZKSwizzle.m; sourceTree = "<group>"; };
-		FB26115D1E09D32A001C1DC7 /* NoFavicons */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = folder; path = NoFavicons; sourceTree = "<group>"; };
-		FB45D88D1D04A5C7009536AD /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = NoFavicons/Info.plist; sourceTree = "<group>"; };
+		FB2D89B91F2AEAD40004310F /* BookmarkButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BookmarkButtonCell.h; path = "../../Desktop/z/chrome 60/BookmarkButtonCell.h"; sourceTree = "<group>"; };
+		FBC5C3DA1F33026300B16823 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = NoFavicons/Info.plist; sourceTree = "<group>"; };
+		FBC77E641F2955BE0045D548 /* BookmarkButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BookmarkButton.h; path = "../../Desktop/z/chrome 60/BookmarkButton.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,7 +38,7 @@
 				FBD4F7AF1D049DEB001C318A /* ZKSwizzle */,
 				FBD4F7B01D049DF6001C318A /* Headers */,
 				2E2623A814F5914700EF319B /* NoFavicons.m */,
-				FB45D88D1D04A5C7009536AD /* Info.plist */,
+				FBC5C3DA1F33026300B16823 /* Info.plist */,
 				2E26239314F590D000EF319B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -62,7 +63,8 @@
 		FBD4F7B01D049DF6001C318A /* Headers */ = {
 			isa = PBXGroup;
 			children = (
-				FB26115D1E09D32A001C1DC7 /* NoFavicons */,
+				FBC77E641F2955BE0045D548 /* BookmarkButton.h */,
+				FB2D89B91F2AEAD40004310F /* BookmarkButtonCell.h */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
@@ -93,7 +95,7 @@
 		2E26238914F590D000EF319B /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0810;
+				LastUpgradeCheck = 0900;
 			};
 			buildConfigurationList = 2E26238C14F590D000EF319B /* Build configuration list for PBXProject "NoFavicons" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -140,13 +142,19 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJCPP_ARC_ABI = NO;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -186,13 +194,19 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJCPP_ARC_ABI = NO;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -210,7 +224,6 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-undefined",
 					warning,
