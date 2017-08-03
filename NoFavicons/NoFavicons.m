@@ -44,10 +44,14 @@ NoFavicons *plugin;
 // Adjust the frame size to be the size the title plus padding to account for removal of image
 - (void)setFrame:(NSRect)frame {
     CGRect newFrame = frame;
+    
     if ([self isInBar]) {
-        NSSize titleSize = [[self attributedTitle] size];
-        newFrame.size.width = ceil(titleSize.width + 10);
+//        if ([self.title length] && [[(BookmarkButtonCell*)[self cell] visibleTitle] length]) {
+            NSSize titleSize = [[self attributedTitle] size];
+            newFrame.size.width = ceil(titleSize.width + 10);
+//        }
     }
+    
     ZKOrig(void, newFrame);
 }
 
@@ -68,12 +72,12 @@ NoFavicons *plugin;
         // Try to weed out any odd buttons that don't belong
         for (BookmarkButton *bm in buttons) {
             if ([bm respondsToSelector:@selector(title)]) {
-                if ([[bm title] length]) {
+//                if ([[bm title] length]) {
                     if (bm.frame.origin.x > 5 && bm.frame.origin.y == 4) {
                         [bm setTag:bm.frame.origin.x];
                         [sortButtons addObject:bm];
                     }
-                }
+//                }
             }
         }
         
@@ -130,7 +134,19 @@ static NSArray *Folderhashes = nil;
 
 // Hide the button image
 - (struct CGRect)imageRectForBounds:(struct CGRect)arg1 {
-    return CGRectMake(4, -1, 0, 0);
+    if ([self.title length] && [[(BookmarkButtonCell*)self visibleTitle] length])
+        return CGRectMake(4, -1, 0, 0);
+    else
+        return ZKOrig(struct CGRect, arg1);
+}
+
+// Add " ▾" to "Other Bookmarks"
+- (void)setBookmarkCellText:(id)arg1 image:(id)arg2 {
+    if (![(BookmarkButtonCell*)self isFolderButtonCell])
+        if ([self imageIsFolder:arg2])
+            if (![arg1 hasSuffix:@" ▾"])
+                arg1 = [NSString stringWithFormat:@"%@ ▾", arg1];
+    ZKOrig(void, arg1, arg2);
 }
 
 // Add " ▾" to folders in the bookmar bar
