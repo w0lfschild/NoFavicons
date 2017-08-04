@@ -11,6 +11,7 @@
 /*------------------------------------*/
 
 NoFavicons *plugin;
+BOOL is109;
 
 @implementation NoFavicons 
 
@@ -26,8 +27,12 @@ NoFavicons *plugin;
 + (void) load {
     NSLog(@"NoFavicons loading...");
     plugin = [NoFavicons sharedInstance];
+    is109 = (NSProcessInfo.processInfo.operatingSystemVersion.minorVersion == 9);
+    
+    // Swizzle
     ZKSwizzle(wb_BookmarkButtonCell, BookmarkButtonCell);
     ZKSwizzle(wb_BookmarkButton, BookmarkButton);
+    
     NSLog(@"%@ loaded into %@ on macOS 10.%ld", [self class], [[NSBundle mainBundle] bundleIdentifier], [[NSProcessInfo processInfo] operatingSystemVersion].minorVersion);
 }
 
@@ -41,6 +46,10 @@ NoFavicons *plugin;
 
 @implementation wb_BookmarkButton
 
+- (void)setTitle:(NSString *)title {
+    ZKOrig(void, title);
+}
+
 // Adjust the frame size to be the size the title plus padding to account for removal of image
 - (void)setFrame:(NSRect)frame {
     CGRect newFrame = frame;
@@ -48,23 +57,20 @@ NoFavicons *plugin;
     if ([self isInBar]) {
 //        if ([self.title length] && [[(BookmarkButtonCell*)[self cell] visibleTitle] length]) {
             NSSize titleSize = [[self attributedTitle] size];
-            newFrame.size.width = ceil(titleSize.width + 10);
+            if (NSProcessInfo.processInfo.operatingSystemVersion.minorVersion == 9)
+                newFrame.size.width = ceil(titleSize.width + 12);
+            else
+                newFrame.size.width = ceil(titleSize.width + 10);
 //        }
     }
     
     ZKOrig(void, newFrame);
 }
 
-//- (void)draggingSession:(id)arg1 endedAtPoint:(struct CGPoint)arg2 operation:(unsigned long long)arg3 {
-//    ZKOrig(void, arg1, arg2, arg3);
-//}
-
 // Manually work some magic to allign all the buttons ✨
 - (void)setFrameOrigin:(NSPoint)newOrigin {
-//    NSLog(@"wb_ %hhd", ZKHookIvar(self, BOOL, "dragPending_"));
     CGPoint origin = newOrigin;
     if ([self isInBar]) {
-        
         // Make an array of all buttons in bookmark bar
         NSMutableArray *buttons = [[NSMutableArray alloc] initWithArray:[[self superview] subviews]];
         NSMutableArray *sortButtons = [[NSMutableArray alloc] init];
@@ -72,12 +78,10 @@ NoFavicons *plugin;
         // Try to weed out any odd buttons that don't belong
         for (BookmarkButton *bm in buttons) {
             if ([bm respondsToSelector:@selector(title)]) {
-//                if ([[bm title] length]) {
-                    if (bm.frame.origin.x > 5 && bm.frame.origin.y == 4) {
-                        [bm setTag:bm.frame.origin.x];
-                        [sortButtons addObject:bm];
-                    }
-//                }
+                if (bm.frame.origin.x > 5 && bm.frame.origin.y == 4) {
+                    [bm setTag:bm.frame.origin.x];
+                    [sortButtons addObject:bm];
+                }
             }
         }
         
@@ -144,19 +148,42 @@ static NSArray *Folderhashes = nil;
 - (void)setBookmarkCellText:(id)arg1 image:(id)arg2 {
     if (![(BookmarkButtonCell*)self isFolderButtonCell])
         if ([self imageIsFolder:arg2])
-            if (![arg1 hasSuffix:@" ▾"])
-                arg1 = [NSString stringWithFormat:@"%@ ▾", arg1];
+            arg1 = [self appendArrow:arg1];
     ZKOrig(void, arg1, arg2);
 }
 
+// 10.9 Fix
+- (void)setImage:(NSImage *)image {
+    ZKOrig(void, image);
+    if (is109) {
+        if (![(BookmarkButtonCell*)self isFolderButtonCell])
+            if ([self imageIsFolder:[self image]])
+                [self setTag:101];
+        image = [NSImage alloc];
+        if (![(BookmarkButtonCell*)self isFolderButtonCell])
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{ ZKOrig(void, image); });
+        else
+            ZKOrig(void, image);
+    }
+}
+
+
 // Add " ▾" to folders in the bookmar bar
 - (void)setTitle:(NSString *)title {
-    if (![(BookmarkButtonCell*)self isFolderButtonCell]) {
+    if (is109)
+        if ([self tag] == 101)
+            title = [self appendArrow:title];
+    if (![(BookmarkButtonCell*)self isFolderButtonCell])
         if ([self imageIsFolder:[self image]])
-            if (![title hasSuffix:@" ▾"])
-                title = [NSString stringWithFormat:@"%@ ▾", title];
-    }
+            title = [self appendArrow:title];
     ZKOrig(void, title);
+}
+
+// Add " ▾" to end of input string if it's not already there
+- (NSString *)appendArrow:(NSString*)original {
+    if (![original hasSuffix:@" ▾"])
+        original = [NSString stringWithFormat:@"%@ ▾", original];
+    return original;
 }
 
 // Check if a button image is a folder image
