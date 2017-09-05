@@ -5,54 +5,24 @@
 
 @import AppKit;
 
-@interface NoFavicons : NSObject
-@end
-
 /*------------------------------------*/
 
-NoFavicons *plugin;
-NSMutableArray *barItems;
 NSInteger otherBMX;
 int appsWidth;
 BOOL is109;
 BOOL isAppsVis;
 
-void DumpObjcMethods(Class clz) {
-    
-    unsigned int methodCount = 0;
-    Method *methods = class_copyMethodList(clz, &methodCount);
-    
-    NSLog(@"wb_ Found %d methods on '%s'\n", methodCount, class_getName(clz));
-    
-    for (unsigned int i = 0; i < methodCount; i++) {
-        Method method = methods[i];
-        
-        NSLog(@"wb_ '%s' has method named '%s' of encoding '%s'\n",
-               class_getName(clz),
-               sel_getName(method_getName(method)),
-               method_getTypeEncoding(method));
-    }
-    
-    free(methods);
-}
+/*------------------------------------*/
 
-@implementation NoFavicons 
+@interface NoFavicons : NSObject
+@end
 
-+ (NoFavicons*) sharedInstance {
-    static NoFavicons * plugin = nil;
-    
-    if (plugin == nil)
-        plugin = [[NoFavicons alloc] init];
-    
-    return plugin;
-}
+@implementation NoFavicons
 
 + (void) load {
     NSLog(@"NoFavicons loading...");
     
     // Initialize a few things
-    plugin = [NoFavicons sharedInstance];
-    barItems = [[NSMutableArray alloc] init];
     is109 = (NSProcessInfo.processInfo.operatingSystemVersion.minorVersion == 9);
     appsWidth = 0;
     otherBMX = 0;
@@ -131,17 +101,6 @@ void DumpObjcMethods(Class clz) {
                 BookmarkButton *prev = (BookmarkButton*)[someButtons lastObject];
                 xPos = prev.frame.origin.x + prev.frame.size.width + 2;
             }
-//            barItems = [[NSMutableArray alloc] initWithArray:someButtons];
-//            if (![barItems containsObject:self])
-//                [barItems addObject:self];
-//
-//            if ([barItems containsObject:self]) {
-//                NSUInteger myPos = [barItems indexOfObject:self];
-//                if (myPos > 0) {
-//                    BookmarkButton *prev = (BookmarkButton*)[barItems objectAtIndex:myPos - 1];
-//                    xPos = prev.frame.origin.x + prev.frame.size.width + 2;
-//                }
-//            }
         }
         origin.x = xPos;
     }
