@@ -11,7 +11,30 @@
 /*------------------------------------*/
 
 NoFavicons *plugin;
+NSMutableArray *barItems;
+NSInteger otherBMX;
+int appsWidth;
 BOOL is109;
+BOOL isAppsVis;
+
+void DumpObjcMethods(Class clz) {
+    
+    unsigned int methodCount = 0;
+    Method *methods = class_copyMethodList(clz, &methodCount);
+    
+    NSLog(@"wb_ Found %d methods on '%s'\n", methodCount, class_getName(clz));
+    
+    for (unsigned int i = 0; i < methodCount; i++) {
+        Method method = methods[i];
+        
+        NSLog(@"wb_ '%s' has method named '%s' of encoding '%s'\n",
+               class_getName(clz),
+               sel_getName(method_getName(method)),
+               method_getTypeEncoding(method));
+    }
+    
+    free(methods);
+}
 
 @implementation NoFavicons 
 
@@ -26,8 +49,14 @@ BOOL is109;
 
 + (void) load {
     NSLog(@"NoFavicons loading...");
+    
+    // Initialize a few things
     plugin = [NoFavicons sharedInstance];
+    barItems = [[NSMutableArray alloc] init];
     is109 = (NSProcessInfo.processInfo.operatingSystemVersion.minorVersion == 9);
+    appsWidth = 0;
+    otherBMX = 0;
+    isAppsVis = false;
     
     // Swizzle
     ZKSwizzle(wb_BookmarkButtonCell, BookmarkButtonCell);
@@ -40,14 +69,23 @@ BOOL is109;
 
 /*------------------------------------*/
 
-
 @interface wb_BookmarkButton : NSButton
 @end
 
 @implementation wb_BookmarkButton
 
-- (void)setTitle:(NSString *)title {
-    ZKOrig(void, title);
+// Check if the "Apps" button is hidden or not
+- (void)setHidden:(BOOL)hidden {
+    if ([self.title isEqualToString:NSLocalizedString(@"Apps", nil)]) {
+        appsWidth = self.frame.size.width;
+        isAppsVis = !hidden;
+    }
+    
+    // Fix for an issue where an empty bookmark that crashes the browser when clicked shows after removing a bookmark
+    if ([self.title isEqualToString:NSLocalizedString(@"(empty)", nil)])
+        hidden = true;
+    
+    ZKOrig(void, hidden);
 }
 
 // Adjust the frame size to be the size the title plus padding to account for removal of image
@@ -55,13 +93,11 @@ BOOL is109;
     CGRect newFrame = frame;
     
     if ([self isInBar]) {
-//        if ([self.title length] && [[(BookmarkButtonCell*)[self cell] visibleTitle] length]) {
+        // Only resize if the button has a title to prevent resizing the overflow button
+        if ([[(BookmarkButtonCell*)[self cell] visibleTitle] length]) {
             NSSize titleSize = [[self attributedTitle] size];
-            if (NSProcessInfo.processInfo.operatingSystemVersion.minorVersion == 9)
-                newFrame.size.width = ceil(titleSize.width + 12);
-            else
-                newFrame.size.width = ceil(titleSize.width + 10);
-//        }
+            newFrame.size.width = ceil(titleSize.width + 10);
+        }
     }
     
     ZKOrig(void, newFrame);
@@ -70,41 +106,61 @@ BOOL is109;
 // Manually work some magic to allign all the buttons ✨
 - (void)setFrameOrigin:(NSPoint)newOrigin {
     CGPoint origin = newOrigin;
+    
     if ([self isInBar]) {
-        // Make an array of all buttons in bookmark bar
-        NSMutableArray *buttons = [[NSMutableArray alloc] initWithArray:[[self superview] subviews]];
-        NSMutableArray *sortButtons = [[NSMutableArray alloc] init];
+        // Get an array of all the buttons in the Bookmark Bar
+        SEL getController = NSSelectorFromString(@"controller");
+        NSArray *someButtons = [[NSArray alloc] initWithArray:[[[self superview] performSelector:getController] buttons]];
         
-        // Try to weed out any odd buttons that don't belong
-        for (BookmarkButton *bm in buttons) {
-            if ([bm respondsToSelector:@selector(title)]) {
-                if (bm.frame.origin.x > 5 && bm.frame.origin.y == 4) {
-                    [bm setTag:bm.frame.origin.x];
-                    [sortButtons addObject:bm];
+        // The start position of the leftmost button
+        int xPos = 5;
+        if (isAppsVis)
+            xPos = 7 + appsWidth;
+        
+        // Set the xPos of self to equal the xPos of the button one to the left plus our own width plus 2 for buffer
+        // When the browser is first initializing the buttons we don't show up in the someButtons array
+        // To work around this we just assume we are the next button after the last
+        if (someButtons.count > 0) {
+            if ([someButtons containsObject:self]) {
+                NSUInteger myPos = [someButtons indexOfObject:self];
+                if (myPos > 0) {
+                    BookmarkButton *prev = (BookmarkButton*)[someButtons objectAtIndex:myPos - 1];
+                    xPos = prev.frame.origin.x + prev.frame.size.width + 2;
                 }
+            } else {
+                BookmarkButton *prev = (BookmarkButton*)[someButtons lastObject];
+                xPos = prev.frame.origin.x + prev.frame.size.width + 2;
             }
+//            barItems = [[NSMutableArray alloc] initWithArray:someButtons];
+//            if (![barItems containsObject:self])
+//                [barItems addObject:self];
+//
+//            if ([barItems containsObject:self]) {
+//                NSUInteger myPos = [barItems indexOfObject:self];
+//                if (myPos > 0) {
+//                    BookmarkButton *prev = (BookmarkButton*)[barItems objectAtIndex:myPos - 1];
+//                    xPos = prev.frame.origin.x + prev.frame.size.width + 2;
+//                }
+//            }
         }
-        
-        // Sort the buttons by x position from smallest to largest
-        NSSortDescriptor *sortDescriptor;
-        sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"tag" ascending:YES];
-        NSArray *final = [[NSArray alloc] initWithArray:sortButtons];
-        final = [final sortedArrayUsingDescriptors:@[sortDescriptor]];
-        
-        // Loop through the button list until we match the current button
-        if (final.count > 1) {
-            for (int i = 1; i < (final.count - 1); i++) {
-                if ([self isEqualTo:[final objectAtIndex:i]]) {
-                    NSObject *prev = [final objectAtIndex:i-1];
-                    BookmarkButton *test = (BookmarkButton*)prev;
-                    int newX = test.frame.origin.x + test.frame.size.width + 2;
-                    origin.x = newX;
-//                    NSLog(@"wb_ %@ : %@ : %@ : %@", [self title], NSStringFromRect(self.frame), test.title, NSStringFromRect(test.frame));
-                    break;
-                }
-            }
-        }
+        origin.x = xPos;
     }
+    
+    // Always show "Apps" button at left side of window
+    if ([self.title isEqualToString:NSLocalizedString(@"Apps", nil)])
+        origin.x = 5;
+    
+    // Always show "Other Bookmarks" at right side of window
+    if ([self.title isEqualToString:NSLocalizedString(@"Other Bookmarks ▾", nil)]) {
+        origin.x = [self superview].frame.size.width - self.frame.size.width - 5;
+        otherBMX = origin.x;
+    }
+
+    // Always show overflow bookmarks button directly left of "Other Bookmarks"
+    if (![[(BookmarkButtonCell*)[self cell] visibleTitle] length])
+        origin.x = otherBMX - self.frame.size.width - 2;
+    
+    // Apply new frame with custom X position
     ZKOrig(void, origin);
 }
 
@@ -119,7 +175,6 @@ BOOL is109;
 @end
 
 /*------------------------------------*/
-
 
 @interface wb_BookmarkButtonCell : NSButtonCell
 @end
@@ -166,7 +221,6 @@ static NSArray *Folderhashes = nil;
             ZKOrig(void, image);
     }
 }
-
 
 // Add " ▾" to folders in the bookmar bar
 - (void)setTitle:(NSString *)title {
