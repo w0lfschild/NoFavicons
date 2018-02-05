@@ -52,7 +52,7 @@ BOOL isAppsVis;
     }
     
     // Fix for an issue where an empty bookmark that crashes the browser when clicked shows after removing a bookmark
-    if ([self.title isEqualToString:NSLocalizedString(@"(empty)", nil)])
+    if ([self.title isEqualToString:NSLocalizedString(@"(empty)", nil)] || [self.title isEqualToString:NSLocalizedString(@"(empty) ▾", nil)])
         hidden = true;
     
     ZKOrig(void, hidden);
@@ -146,7 +146,7 @@ static NSArray *Folderhashes = nil;
 - (struct CGRect)titleRectForBounds:(struct CGRect)arg1 {
     CGRect result = ZKOrig(struct CGRect, arg1);
     result.origin.x = 5;
-    result.size.width = arg1.size.width - 10;
+    result.size.width = arg1.size.width - 8;
     return result;
 }
 
